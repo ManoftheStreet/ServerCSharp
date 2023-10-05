@@ -12,11 +12,15 @@ namespace ServerCore
         {
             while(true)
             {
-                int orginal = Interlocked.Exchange(ref _locked, 1);
-                if (orginal == 0)
-                {
+                /* int orginal = Interlocked.Exchange(ref _locked, 1);
+                 if (orginal == 0)
+                 {
+                     break;
+                 }*/
+                int expected = 0;
+                int desired = 1;
+                if (Interlocked.CompareExchange(ref _locked, desired, expected) == expected)
                     break;
-                }
             }
             
         }
