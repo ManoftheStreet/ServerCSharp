@@ -11,44 +11,43 @@ namespace ServerCore
     {
         static Listener _listener = new Listener();
 
-        static void Main(string[] args)
+        static void OnAcceptHandler(Socket clientSocket)
         {
-            //식당
-            string host = Dns.GetHostName();
-            IPHostEntry ipHost = Dns.GetHostEntry(host);
-            IPAddress ipAddr =  ipHost.AddressList[0];
-            IPEndPoint endPoint = new IPEndPoint(ipAddr, 7777);
-          
             try
             {
-                _listener.Init(endPoint);
+                Session session = new Session();
+                session.Start(clientSocket);
 
-                while (true)
-                {
-                    Console.WriteLine("Listening...");
+                //보낸다
+                byte[] sendBuff = Encoding.UTF8.GetBytes("Welcome to MMORPG Server !");
+                session.Send(sendBuff);
 
-                    //손님입장
-                    Socket clientSocket = _listener.Accept();
+                Thread.Sleep(1000);
 
-                    //받는다
-                    byte[] recvBuff = new byte[1024];
-                    int recvBytes = clientSocket.Receive(recvBuff);
-                    string recvData = Encoding.UTF8.GetString(recvBuff, 0, recvBytes);
-                    Console.WriteLine($"[From Client] {recvData}");
-
-                    //보낸다
-                    byte[] sendBuff = Encoding.UTF8.GetBytes("Welcome to MMORPG Server !");
-                    clientSocket.Send(sendBuff);
-
-                    //쫓아낸다
-                    clientSocket.Shutdown(SocketShutdown.Both);
-                    clientSocket.Close();
-                }
+                session.Disconnect();
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.ToString());
             }
         }
+
+        static void Main(string[] args)
+        {
+            //식당
+            string host = Dns.GetHostName();
+            IPHostEntry ipHost = Dns.GetHostEntry(host);
+            IPAddress ipAddr = ipHost.AddressList[0];
+            IPEndPoint endPoint = new IPEndPoint(ipAddr, 7777);
+
+            _listener.Init(endPoint, OnAcceptHandler);
+            Console.WriteLine("Listening...");
+
+            while (true)
+            {
+                
+            }
+        }
+            
     }
 }

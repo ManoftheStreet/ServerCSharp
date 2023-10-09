@@ -15,33 +15,42 @@ namespace DummyClient
             IPAddress ipAddr = ipHost.AddressList[0];// 첫번째 ip주소를 서택
             IPEndPoint endPoint = new IPEndPoint(ipAddr, 7777);//현재 IP 주소와 포트번호로 엔드포인트 생성 (숫자만 가능)
 
-            //휴대폰 설정
-            Socket socket = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-
-            try
+            while (true)
             {
-                //문지기에게 입장 문의
-                socket.Connect(endPoint);
-                Console.WriteLine($"Connected To{socket.RemoteEndPoint.ToString()}");
+                //휴대폰 설정
+                Socket socket = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
-                //보낸다
-                byte[] sendBuff = Encoding.UTF8.GetBytes("Hello World!");
-                int sendBytes = socket.Send(sendBuff);
+                try
+                {
+                    //문지기에게 입장 문의
+                    socket.Connect(endPoint);
+                    Console.WriteLine($"Connected To{socket.RemoteEndPoint.ToString()}");
 
-                //받는다
-                byte[] recvBuff = new byte[1024];
-                int reevBytes = socket.Receive(recvBuff);
-                string recvData = Encoding.UTF8.GetString(recvBuff, 0, reevBytes);
-                Console.WriteLine($"[from Server] {recvData}");
+                    //보낸다
+                    for(int i = 0; i < 5; i++)
+                    {
+                        byte[] sendBuff = Encoding.UTF8.GetBytes($"Hello World! {i} ! ");
+                        int sendBytes = socket.Send(sendBuff);
+                    }
+                    
 
-                //나간다
-                socket.Shutdown(SocketShutdown.Both);
-                socket.Close();
+                    //받는다
+                    byte[] recvBuff = new byte[1024];
+                    int reevBytes = socket.Receive(recvBuff);
+                    string recvData = Encoding.UTF8.GetString(recvBuff, 0, reevBytes);
+                    Console.WriteLine($"[from Server] {recvData}");
+
+                    //나간다
+                    socket.Shutdown(SocketShutdown.Both);
+                    socket.Close();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.ToString());
+                }
+
+                Thread.Sleep(100);
             }
-            catch(Exception e)
-            {
-                Console.WriteLine(e.ToString());
-            }    
         }
     }
 }
