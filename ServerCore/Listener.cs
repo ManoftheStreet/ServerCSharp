@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ServerCore
 {
-    class Listener
+    public class Listener
     {
         Socket _listenSocket; // 서버에서 클라이언트의 연결 요청을 대기하는 소켓
         Func<Session> _sessionFactory;
