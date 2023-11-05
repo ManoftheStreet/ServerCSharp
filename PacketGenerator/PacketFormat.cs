@@ -11,8 +11,7 @@ namespace PacketGenerator
         //{0} 패킷이름 / 번호목록
         //{1} 패킷 목록
         public static string fileFormat =
-@"
-using ServerCore;
+@"using ServerCore;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -22,7 +21,6 @@ public enum PacketID
 {{
     {0}
 }}
-
 {1}
 ";
 
@@ -85,8 +83,7 @@ class {0}
         //{3}멤버 변수 Read
         //{4}멤버변수 Write
         public static string memberListFormat =
-@"
-public struct {0}
+@"public struct {0}
 {{
     {2}
     public void Read(ReadOnlySpan<byte> s, ref ushort count)
@@ -100,7 +97,6 @@ public struct {0}
         return true;
     }}
 }}
-
 public List<{0}> {1}s = new List<{0}>();
 ";
 
@@ -110,10 +106,15 @@ public List<{0}> {1}s = new List<{0}>();
         public static string readFormat =
 @"this.{0} = BitConverter.{1}(s.Slice(count, s.Length - count));
 count += sizeof({2});";
+        //{0} 변수 이름
+        //{1} 변수 형식
+        public static string readByteFormat =
+@"this.{0} = ({1})segment.Array[segment.Offset + count];
+count += sizeof({1});";
 
         //{0} 변수 이름
         public static string readStringFormat =
-@" ushort {0}Len = BitConverter.ToUInt16(s.Slice(count, s.Length - count));
+@"ushort {0}Len = BitConverter.ToUInt16(s.Slice(count, s.Length - count));
 count += sizeof(ushort);
 this.{0} = Encoding.Unicode.GetString(s.Slice(count, {0}Len));
 count += {0}Len;";
@@ -129,8 +130,7 @@ for(int i = 0; i < {1}Len; i++)
     {0} {1} = new {0}();
     {1}.Read(s, ref count);
     {1}s.Add({1});
-}}
-";
+}}";
 
         //{0} 변수이름
         //{1} 변수 형식
@@ -138,6 +138,11 @@ for(int i = 0; i < {1}Len; i++)
 @"success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), this.{0});
 count += sizeof({1});";
 
+        //{0} 변수 이름
+        //{1} 변수 형식
+        public static string writeByteFormat =
+@"segment.Array[segment.Offset + count] = (byte)this.{0};
+count += sizeof({1});";
 
         //{0} 변수이름
         public static string writeStringFormat =
@@ -152,7 +157,7 @@ count += {0}Len;";
 @"success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), (ushort)this.{1}s.Count);
 count += sizeof(ushort);
 foreach ({0} {1} in this.{1}s)
-    success &= {1}.Write(s, ref count);
+success &= {1}.Write(s, ref count);
 ";
     }
 }
