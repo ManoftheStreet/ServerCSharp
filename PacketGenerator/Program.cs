@@ -7,6 +7,8 @@ namespace PacketGenerator
     class Program
     {
         static string genPackets;
+        static ushort packetId;
+        static string packetEnums;
 
         static void Main(string[] args)
         {
@@ -27,8 +29,8 @@ namespace PacketGenerator
                     //Console.WriteLine(r.Name + " " + r["name"]);
                 }
 
-                string.Format(PacketFormat.fileFormat, "", "");
-                File.WriteAllText("GenPackets.cs", genPackets);
+                string fileText = string.Format(PacketFormat.fileFormat, packetEnums, genPackets);
+                File.WriteAllText("GenPackets.cs", fileText);
             }
         }
 
@@ -52,6 +54,7 @@ namespace PacketGenerator
 
             Tuple<string, string, string> t = ParseMembers(r);
             genPackets += string.Format(PacketFormat.packetFormat, packetName, t.Item1, t.Item2, t.Item3);
+            packetEnums += string.Format(PacketFormat.packetEnumFormat, packetName, ++packetId);
         }
 
         //{1} 멤버 변수들
